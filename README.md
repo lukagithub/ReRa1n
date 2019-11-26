@@ -7,7 +7,7 @@ These instructions will get you a copy of the project up and running on your loc
 ## Prerequisites
 ReRa1n is very easy to set up. All you need to do is run
 ```
-$ install.sh
+$ ./install.sh
 ```
 If you are not on a Debian based system, install
 
