@@ -47,7 +47,7 @@ echo
 echo "[*] Installing forwarder script for USB SSH"
 cd not-secret-secret
 sudo chmod +x *
-sudo cp -R ./forwarder.sh /usr/bin
+sudo cp -R ./forward.sh /usr/bin
 cd ..
 echo
 echo "[*] Installing libirecovery"
