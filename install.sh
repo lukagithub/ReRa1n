@@ -9,7 +9,7 @@ echo "[*] Creating deps directory"
 mkdir rerain-deps
 cd rerain-deps
 echo "[*] Starting apt... please input root password."
-sudo apt-get install -y cython libgcrypt20-doc gnutls-doc gnutls-bin usbmuxd git libplist-dev libplist++ python2.7-dev python3-dev libusbmuxd4 libreadline6-dev make libusb-dev openssl libimobiledevice-dev libzip-dev libcurl4-openssl-dev libssl-dev sshpass
+sudo apt-get install -y libusb++ cython libgcrypt20-doc gnutls-doc gnutls-bin usbmuxd git libplist-dev libplist++ python2.7-dev python3-dev libusbmuxd4 libreadline6-dev make libusb-dev openssl libimobiledevice-dev libzip-dev libcurl4-openssl-dev libssl-dev sshpass
 echo "[*] Cloning repositories required to run"
 git clone https://github.com/lzfse/lzfse
 git clone https://github.com/libimobiledevice/libplist
