@@ -4,24 +4,28 @@ echo "FOR OTHER PLATFORMS, SEE README.MD"
 echo 
 echo "Starting in 10 seconds. Press ctrl-C to cancel."
 sleep 10
-
-#begin installation of software - DEBIAN
 echo "[*] Package manager supported (apt)"
 echo "[*] Creating deps directory"
 mkdir rerain-deps
 cd rerain-deps
 echo "[*] Starting apt... please input root password."
-sudo apt-get install libgcrypt20-doc gnutls-doc gnutls-bin usbmuxd git libplist-dev libplist++ python2.7-dev python3-dev libusbmuxd4 libreadline6-dev make libusb-dev openssl libimobiledevice-dev libzip-dev libcurl4-openssl-dev libssl-dev sshpass
+sudo apt-get install -y cython libgcrypt20-doc gnutls-doc gnutls-bin usbmuxd git libplist-dev libplist++ python2.7-dev python3-dev libusbmuxd4 libreadline6-dev make libusb-dev openssl libimobiledevice-dev libzip-dev libcurl4-openssl-dev libssl-dev sshpass
 echo "[*] Cloning repositories required to run"
+git clone https://github.com/lzfse/lzfse
 git clone https://github.com/libimobiledevice/libplist
 git clone https://github.com/libimobiledevice/libusbmuxd
 git clone https://github.com/rcg4u/iphonessh
 git clone https://github.com/AidanGamzer/not-secret-secret.git
-git clone https://github.com/libimobiledevice/libimobiledevice
+git clone --recursive https://github.com/libimobiledevice/libimobiledevice
 git clone https://github.com/libimobiledevice/libirecovery
 git clone https://github.com/libimobiledevice/idevicerestore
 git clone https://github.com/tihmstar/libgeneral
 git clone https://github.com/tihmstar/img4tool
+echo "[*] Installing lzfse"
+cd lzfse
+make
+sudo make install
+cd ..
 echo
 echo "[*] Installing libplist"
 cd libplist
