@@ -142,36 +142,139 @@ ssh_window() {
     main_menu
 }
 
-echo [*] Welcome to ReRa1n
-echo "[*] Checking for dependencies"
-read -p "[*] Do you want to install dependencies manually or have the script do it for you? (M/A) " autog
-if [ $autog = M ]
-then 
-   echo "[*] Manual installation guide available on the github repository under MANUAL.md"
-else
-    if [ ! -e rerain-dep ]
-    then
-        # Telling the user dependencies have not been found
-        echo "[-] Dependencies not found"
-        # Telling the user we are installing dependencies
-        echo "[*] Installing dependencies"
-        # Telling the user we are checking package manager
-        echo "[*] Checking Package Manager"
-        # Checking package manager
-        if [ $(which apt-get) ];
-        then
-            sh install.sh
-        else
-            echo "[-] Package manager not supported please go to the github page and open an issue adding you current package manager"
-            exit
-        fi
+# Defining function
+function none_menu {
+    # Informing the user of requirements
+    echo "[*] These functions require USB access"
+    echo "[*] Each function will say its individual iDevice mode requiremnts"
+    # Informing the user of what to do
+    echo "[*] Please selected an option: "
+    # Listing options and there requirments
+    echo "[*] Restore/Update - (1) [DFU/RESTORE/USERLAND]"
+    echo "[*] Reboot - (2) [DFU/RESTORE/USERLAND]"
+    echo "[*] iDeviceInfo - (3) [DFU/RESTORE/UNLOCKED-USERLAND]"
+    echo "[*] iDeviceVerbose - (4) [UNLOCKED-USERLAND]"
+    echo "[*] Exit script - (X)"
+    # Promting user with a select menu
+    read -p "[*] Select and option using the single characters: " option
+    # Checking if the user selected option number 1
+    if [ $option = "1" ] ; then
+        # Running external idevicerestore script
+        idevicerestore -l
+        # Looping back to beggining of menu
+        none_menu
+    # Checking if the user selected option number 2
+    elif [ $option = "2" ] ; then
+        # Prompting user whether device is in DFU/RESTORE or USERLAND
+        read -p "[*] Is your iDevice in DFU/RESTORE (1) or USERLAND (2): " userlandbro
+        # Checking if device is in recovery/dfu
+        if [ $userlandbro = 1 ]; then
+            # Running external irecovery script with -c reboot arguement
+            irecovery -c Reboot
+        elif [ $userlandbro = 2 ]; then
+            # Running external idevicediagnostics script with restard arguement
+            idevicediagnostics restart
+        fi 
+        # Informing the user their device is rebooting
+        echo "[*] iDevice rebooting"
+        # Looping back to beggining of menu
+        none_menu
+    # Checking if the user selected option number 3
+    elif [ $option = "3" ]; then
+        # Running external ideviceinfo script and logging its output to ideviceinfo.txt
+        ideviceinfo > ideviceinfo.txt
+        # Outputting only certain parts of the logged file
+        grep ActivationState: ideviceinfo.txt
+        grep BasebandVersion: ideviceinfo.txt
+        grep BluetoothAddres: ideviceinfo.txt
+        grep BuildVersion: ideviceinfo.txt
+        grep CPUArchitecture: ideviceinfo.txt
+        grep DeviceClass: ideviceinfo.txt
+        grep DeviceColor: ideviceinfo.txt
+        grep EthernetAddress: ideviceinfo.txt
+        grep FirmwareVersion: ideviceinfo.txt
+        grep HardwareModel: ideviceinfo.txt
+        grep HardwarePlatform: ideviceinfo.txt
+        grep PasswordProtected: ideviceinfo.txt
+        grep ProductType: ideviceinfo.txt
+        grep ProductVersion: ideviceinfo.txt
+        grep -w SerialNumber: ideviceinfo.txt
+        grep WiFiAddress: ideviceinfo.txt
+        # Deleting ideviceinfo.txt file
+        rm -f ideviceinfo.txt
+        # Looping back to beggining of menu
+        none_menu
+    # Checking if the user selected option 4
+    elif [ $option = "4" ]; then
+        # Warning the user
+        echo "[-] Warning this may cause lag"
+        echo "[-] Warning this is very fast and will be outputed to a file called \"device_logs.txt\""
+        echo "[-] Output will not be shown on screen"
+        # Waiting 2 seconds
+        sleep 2
+        # Informing the user it is starting
+        echo "[*] Starting, enter CTRL + C to stop "
+        # Waiting one second
+        sleep 1
+        # Informing the user its started
+        echo "[*] Started"
+        # Running it
+        idevicesyslog > device_logs.txt
+    # Checking if the user selected option X (exit)
+    elif [ $option = "X" ] ; then
+        # Informing the user they are exiting the script
+        echo "[-] Exiting script"
+        # Exiting script
         exit
+    # Checking if none of the valid options were selected
+    else 
+        # Informing the user they selected an invalid option
+        echo "[*] Invalid option selected"
+        # Looping back to begginging of menu
+        none_menu
+    # Closing if statements
     fi
-fi
-if [ -e rerain-dep ]
-then
-    echo "[*] Dependencies found!"
-fi
+# Closing function
+}
+
+# Welcoming the user
+echo "[*] Welcome to ReRa1n"
+# Checking for dependencies
+echo "[*] Checking for dependencies"
+if [ ! -e .installed ]; then
+    # Informing the user that the dependencies were not found
+    echo "[-] Dependencies not found."
+    # Prompting the user if they would like to install the dependencies manually or automatically
+    read -p "[*] Would you like to install dependencies manually or automatically (M/A): " install
+    # Checking if the user would like automatic dependency install
+    if [ $install = A ]; then
+        # Informing the user that they have selected automatic install
+        echo "[*] Automatically installing dependencies"
+        # Running the install script, outputting the log to .installed
+        ./install.sh > .installed
+        # Informing the user the install script is finished
+        echo "[*] Finished, if you encounter errors or bugs please read the .installed file"
+    # Checking if the user wants to manually install the dependencies
+    elif [ $install = M ]; then
+        # Making sure the user is Linux-Ready 
+        echo "[-] This is recommended for daily linux users only"
+        # Informing the users of instructions
+        echo "[*] Please run the install-no-deb.sh file"
+        echo "[*] After create a file with the name \".installed\""
+    # Else statement
+    else 
+        # Informing the user that the response was inadequate 
+        echo "[-] Unknown response"
+        # Informing the user of the next action (Exit)
+        echo "[-] Exiting"
+        # Exiting
+        exit
+    # Closing the if statments
+    fi
+# Closing the if statements
+fi 
+# Informing the user that the dependency check is complete and that it was sucsessfull
+echo "[*] Dependencies found"
 read -p "[*] SSH over WiFi, USB or NONE (CaSeSeNsItIvE): " wifiorusb
 echo [*] You chose $wifiorusb.
 if [ $wifiorusb = "WiFi" ]
@@ -195,7 +298,7 @@ then
     ideviceip=localhost
     ideviceport=2222
     cd rerain-dep
-    echo "[*] Open a second terminal window and enter: cd /usr/bin sudo fordward.sh "
+    echo "[*] Open a second terminal window and enter: cd /usr/bin && sudo fordward.sh "
     read -p "[*] Press enter to continue:"
     read -p "[*] Enter the root password of your iDevice (Default is alpine, make sure to change this): " idevicepassword
     ssh root@localhost -p 2222 exit
@@ -204,43 +307,7 @@ then
     main_menu
 elif [ $wifiorusb = "NONE" ]
 then
-    echo "[-] This function is W.I.P"
-    echo "[*] Please select an option: "
-    echo "[*] Restore/Update - (1)"
-    echo "[*] Reboot - [DFU/RESTORE] - (2)"
-  #  echo "[*] iDeviceInfo V1.1 - Experimental (3)"
-    read -p "[*] Select an option using the shortened option names" option
-    if [ $option = "1" ]
-    then
-        idevicerestore -l
-        exit
-    elif [ $option = "2" ]
-    then
-        irecovery -c reboot
-        echo "[*] iDevice rebooting"
-        exit
-    elif [ $option = 3 ]
-    then
-        ideviceinfo > ideviceinfo.txt
-        grep ActivationState: ideviceinfo.txt
-        grep BasebandVersion: ideviceinfo.txt
-        grep BluetoothAddress: ideviceinfo.txt
-        grep BuildVersion: ideviceinfo.txt
-        grep CPUArchitecture: ideviceinfo.txt
-        grep DeviceClass: ideviceinfo.txt
-        grep DeviceColor: ideviceinfo.txt
-        grep EthernetAddress: ideviceinfo.txt
-        grep FirmwareVersion: ideviceinfo.txt
-        grep HardwareModel: ideviceinfo.txt
-        grep HardwarePlatform: ideviceinfo.txt
-        grep PasswordProtected: ideviceinfo.txt
-        grep ProductType: ideviceinfo.txt
-        grep ProductVersion: ideviceinfo.txt
-        grep -w SerialNumber: ideviceinfo.txt
-        grep WiFiAddress: ideviceinfo.txt
-    else
-        exit
-    fi
+    none_menu
 else
     echo [-] Unknown or Unavailable selected.
     exit
